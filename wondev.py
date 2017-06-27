@@ -59,7 +59,10 @@ def find_best_move(board, unit_pos, other_pos):
     moves = sorted(find_adj(board, unit_pos, other_pos), reverse=True)
     # Choose the highest height square that has building options adjacent to it
     for height, d in moves:
-        if find_adj(board, make_move(unit_pos, d), other_pos):
+        # Don't move to positions with no other adjacent moves
+        if not is_valid_move(board, unit_pos, make_move(unit_pos, d), other_pos):
+            continue
+        if len(find_adj(board, make_move(unit_pos, d), other_pos)) > 1:
             return d
 
 # Build on a now adjacent spot
@@ -73,6 +76,8 @@ def find_best_build(board, unit_pos, other_pos):
             build_dir = d + " " + str(height)
             break
     else:
+        if d == "None":
+            print "Could not build from ", unit_pos
         new_pos = make_move(unit_pos, d)
         # Build on any of the level 3 squares (return direction of the first one)
         # The height should be 3 in this case
