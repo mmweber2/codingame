@@ -68,20 +68,21 @@ def find_adj(board, pos, other_pos):
     
 # TODO: Don't move onto spots that have no <= 2 spots adjacent, UNLESS it is the end of the game
 # Move to the best spot, then we will build on the best building spot from there
+# TODO: The 1-unit only works with 2 units, will need to be extended
 def find_best_move(board, my_units, other_pos):
     moves = []
     for i in xrange(len(my_units)):
         # Count my other unit as an 'other' unit
         # TODO: Enable pushing
-        other = other_pos.append(my_units[1-i])
+        other = other_pos + [my_units[1-i]]
         moves.extend(move + (i,) for move in find_adj(board, my_units[i], other))
     # Choose the highest height square that has building options adjacent to it
     for height, d, unit in moves:
         unit_pos = my_units[unit]
-        other = other_pos.append(my_units[1-unit])
+        other = other_pos + [my_units[1-unit]]
         if not is_valid_move(board, unit_pos, make_move(unit_pos, d), other):
             continue
-        if len(find_adj(board, make_move(unit_pos, d), other)) > 1:
+        if len(find_adj(board, make_move(unit_pos, d), other)) > 0:
             return (d, unit)
             
 # Build on a now adjacent spot
@@ -92,7 +93,8 @@ def find_best_move(board, my_units, other_pos):
 def find_best_build(board, unit_pos, other_pos):
     moves = find_adj(board, unit_pos, other_pos)
     build_dir = "None"
-    for height, d, unit in moves:
+    # Here, moves only has 2 items because we did not add the unit
+    for height, d in moves:
         # Try to build on the highest < 3 level square we can, but if our only option
         #    is a level 3 square, build on one of those
         if height < 3:
@@ -104,8 +106,8 @@ def find_best_build(board, unit_pos, other_pos):
         new_pos = make_move(unit_pos, d)
         # Build on any of the level 3 squares (return direction of the first one)
         # The height should be 3 in this case
-        assert board[new_pos.y][new_pos.x] == 3
-        build_dir = moves[0][1] + " " + 3
+        assert board[new_pos.y][new_pos.x] == "3"
+        build_dir = moves[0][1] + " " + "3"
     return build_dir
                 
         
